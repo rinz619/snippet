@@ -68,3 +68,24 @@ class snippetlist(APIView):
             }
         return Response(tmp)
     
+    def post(self,request):
+        
+        title = request.POST.get('title')
+        try:
+            tag = Tags.objects.get(title=title)
+        except:
+            tag = Tags.objects.create(title=title)
+        data = Snippets()
+        data.title = title
+        data.note = request.POST.get('note')
+        data.user = request.user
+        data.tags = tag
+        data.save()
+        status_code = status.HTTP_200_OK
+        tmp = {
+                "status": True,
+                "message": "Success",
+                "status_code": status_code,
+            }
+        return Response(tmp)
+    
