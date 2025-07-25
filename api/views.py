@@ -89,3 +89,26 @@ class snippetlist(APIView):
             }
         return Response(tmp)
     
+    
+       
+class snippetdetails(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        data = {}
+        id = request.GET.get('id')
+        snippet = Snippets.objects.get(id=id,user=request.user.id)
+        data['detail'] = {
+            'id':snippet.id,
+            'title':snippet.title,
+            'note':snippet.note,
+            'datetime':snippet.created_at,
+        }
+        status_code = status.HTTP_200_OK
+        tmp = {
+                "status": True,
+                "data":data,
+                "message": "Success",
+                "status_code": status_code,
+            }
+        return Response(tmp)
