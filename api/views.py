@@ -144,3 +144,22 @@ class snippetdetails(APIView):
                 "status_code": status_code,
             }
         return Response(tmp)
+    
+
+            
+class snippetdelete(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        data = {}
+        id = request.GET.get('id')
+        Snippets.objects.filter(id=id,user=request.user.id).delete()
+        data['snippets'] = list(Snippets.objects.all().values('id','title'))
+        status_code = status.HTTP_200_OK
+        tmp = {
+                "status": True,
+                "data":data,
+                "message": "Success",
+                "status_code": status_code,
+            }
+        return Response(tmp)
