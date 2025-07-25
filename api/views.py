@@ -112,3 +112,35 @@ class snippetdetails(APIView):
                 "status_code": status_code,
             }
         return Response(tmp)
+    
+    def post(self,request):
+        data = {}
+        id = request.POST.get('id')
+        snippet = Snippets.objects.get(id=id,user=request.user.id)
+        title = request.POST.get('title')
+        try:
+            tag = Tags.objects.get(title=title)
+        except:
+            tag = Tags.objects.create(title=title)
+        snippet.title = title
+        snippet.note = request.POST.get('note')
+        snippet.user = request.user
+        snippet.tags = tag
+        snippet.save()
+        
+        snippet = Snippets.objects.get(id=id,user=request.user.id)
+        
+        data['detail'] = {
+            'id':snippet.id,
+            'title':snippet.title,
+            'note':snippet.note,
+            'datetime':snippet.created_at,
+        }
+        status_code = status.HTTP_200_OK
+        tmp = {
+                "status": True,
+                "data":data,
+                "message": "Success",
+                "status_code": status_code,
+            }
+        return Response(tmp)
