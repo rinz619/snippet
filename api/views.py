@@ -32,3 +32,19 @@ class login(APIView):
                 "status_code": status_code,
             }
         return Response(tmp)
+    
+    
+class tagslist(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        data = {}
+        data['tags'] = list(Tags.objects.all().values('id','title'))
+        status_code = status.HTTP_200_OK
+        tmp = {
+                "status": True,
+                "data":data,
+                "message": "Success",
+                "status_code": status_code,
+            }
+        return Response(tmp)
