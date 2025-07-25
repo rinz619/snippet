@@ -48,3 +48,23 @@ class tagslist(APIView):
                 "status_code": status_code,
             }
         return Response(tmp)
+    
+
+
+            
+class snippetlist(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        data = {}
+        data['total_snippets'] = Snippets.objects.all().count()
+        data['snippets'] = list(Snippets.objects.all().values('id','title'))
+        status_code = status.HTTP_200_OK
+        tmp = {
+                "status": True,
+                "data":data,
+                "message": "Success",
+                "status_code": status_code,
+            }
+        return Response(tmp)
+    
