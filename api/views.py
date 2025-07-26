@@ -17,7 +17,6 @@ class login(APIView):
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             user = User.objects.create(email=email)
-            
         refresh_token = RefreshToken.for_user(user)
         access_token = refresh_token.access_token
 
@@ -81,20 +80,41 @@ class snippetdetails(APIView):
     def get(self,request):
         data = {}
         id = request.GET.get('id')
-        snippet = Snippets.objects.get(id=id,user=request.user.id)
-        data['detail'] = {
-            'id':snippet.id,
-            'title':snippet.title,
-            'note':snippet.note,
-            'datetime':snippet.created_at,
-        }
-        status_code = status.HTTP_200_OK
-        tmp = {
+        try:
+            snippet = Snippets.objects.get(id=id)
+            print(snippet.user.id)
+            print(request.user.id)
+            if snippet.user.id != request.user.id:
+                status_code = status.HTTP_200_OK
+                tmp = {
+                    "status": True,
+                    "data":data,
+                    "message": "User Dont have access to this snippet",
+                    "status_code": status_code,
+                }
+                return Response(tmp)
+            data['detail'] = {
+                'id':snippet.id,
+                'title':snippet.title,
+                'note':snippet.note,
+                'datetime':snippet.created_at,
+            }
+            status_code = status.HTTP_200_OK
+            tmp = {
                 "status": True,
                 "data":data,
                 "message": "Success",
                 "status_code": status_code,
             }
+        except:
+            status_code = status.HTTP_404_NOT_FOUND
+            tmp = {
+                "status": False,
+                "data":data,
+                "message": "Snippet not found",
+                "status_code": status_code,
+            }
+        
         return Response(tmp)
     
     def post(self,request):
