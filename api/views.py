@@ -33,22 +33,6 @@ class login(APIView):
             }
         return Response(tmp)
     
-    
-class tagslist(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-    def get(self,request):
-        data = {}
-        data['tags'] = list(Tags.objects.all().values('id','title'))
-        status_code = status.HTTP_200_OK
-        tmp = {
-                "status": True,
-                "data":data,
-                "message": "Success",
-                "status_code": status_code,
-            }
-        return Response(tmp)
-    
 
 
             
@@ -70,13 +54,13 @@ class snippetlist(APIView):
     
     def post(self,request):
         
-        title = request.POST.get('title')
+        title = request.POST.get('tag')
         try:
             tag = Tags.objects.get(title=title)
         except:
             tag = Tags.objects.create(title=title)
         data = Snippets()
-        data.title = title
+        data.title = request.POST.get('title')
         data.note = request.POST.get('note')
         data.user = request.user
         data.tags = tag
@@ -163,3 +147,41 @@ class snippetdelete(APIView):
                 "status_code": status_code,
             }
         return Response(tmp)
+    
+
+    
+class tagslist(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        data = {}
+        data['tags'] = list(Tags.objects.all().values('id','title'))
+        status_code = status.HTTP_200_OK
+        tmp = {
+                "status": True,
+                "data":data,
+                "message": "Success",
+                "status_code": status_code,
+            }
+        return Response(tmp)
+    
+
+    
+class tagsdetails(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        data = {}
+        id = request.GET.get('id')
+        tag = Tags.objects.get(id=id)
+        data['tag'] = tag.title
+        data['snippets'] = list(Snippets.objects.filter(tags=id).values('id','title','note','created_at'))
+        status_code = status.HTTP_200_OK
+        tmp = {
+                "status": True,
+                "data":data,
+                "message": "Success",
+                "status_code": status_code,
+            }
+        return Response(tmp)
+    
